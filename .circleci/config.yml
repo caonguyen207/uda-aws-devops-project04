@@ -1,0 +1,39 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.7-stretch
+      
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "requirements.txt" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run:
+          name: Install dependencies
+          command: |
+            pwd
+            python3 -m venv ~/.devops
+            source ~/.devops/bin/activate
+            make install
+      - run:
+          name: Check lint
+          command: |
+            wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.10.0/hadolint-Linux-x86_64
+            # Grant permission
+            chmod +x /bin/hadolint
+      - save_cache:
+          paths:
+            - ~/.devops
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+      - run:
+          name: Run lint
+          command: |
+            source ~/.devops/bin/activate
+            make lint
