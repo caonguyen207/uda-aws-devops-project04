@@ -13,7 +13,6 @@ jobs:
           - v1-dependencies-{{ checksum "requirements.txt" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
-
       - run:
           name: Install dependencies
           command: |
@@ -25,9 +24,8 @@ jobs:
           paths:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
-      # run lints!
       - run:
-          name: run lint
+          name: Run lint
           command: |
             . venv/bin/activate
             make lint
